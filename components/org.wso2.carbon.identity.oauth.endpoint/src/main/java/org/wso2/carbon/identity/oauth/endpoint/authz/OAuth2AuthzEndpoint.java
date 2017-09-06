@@ -300,7 +300,8 @@ public class OAuth2AuthzEndpoint {
 
             } else if (resultFromLogin != null) { // Authentication response
                 Cookie cookie = FrameworkUtils.getAuthCookie(request);
-                long authTime = getAuthenticatedTimeFromCommonAuthCookie(cookie);
+                String prompt =  request.getParameter(OAuthConstants.OAuth20Params.PROMPT);
+                long authTime = getAuthenticatedTimeFromCommonAuthCookie(cookie , prompt );
                 sessionDataCacheEntry = resultFromLogin;
                 if (authTime > 0) {
                     sessionDataCacheEntry.setAuthTime(authTime);
@@ -386,7 +387,8 @@ public class OAuth2AuthzEndpoint {
 
             } else if (resultFromConsent != null) { // Consent submission
                 Cookie cookie = FrameworkUtils.getAuthCookie(request);
-                long authTime = getAuthenticatedTimeFromCommonAuthCookie(cookie);
+                String prompt =  request.getParameter(OAuthConstants.OAuth20Params.PROMPT);
+                long authTime = getAuthenticatedTimeFromCommonAuthCookie(cookie , prompt );
                 sessionDataCacheEntry = resultFromConsent;
                 OAuth2Parameters oauth2Params = sessionDataCacheEntry.getoAuth2Parameters();
                 if (authTime > 0) {
@@ -1386,13 +1388,17 @@ public class OAuth2AuthzEndpoint {
      * @param cookie CommonAuthId cookie
      * @return the last authenticated timestamp
      */
-    private long getAuthenticatedTimeFromCommonAuthCookie(Cookie cookie) {
+    private long previousAuthTime = 0;
+    private long getAuthenticatedTimeFromCommonAuthCookie(Cookie cookie , String prompt) {
         long authTime = 0;
         if (cookie != null) {
             String sessionContextKey = DigestUtils.sha256Hex(cookie.getValue());
             SessionContext sessionContext = FrameworkUtils.getSessionContextFromCache(sessionContextKey);
             if (sessionContext != null) {
-                if (sessionContext.getProperty(FrameworkConstants.UPDATED_TIMESTAMP) != null) {
+                if (prompt != null && prompt.equals(OAuthConstants.Prompt.NONE)) {
+                    authTime = previousAuthTime;
+                }
+                else if (sessionContext.getProperty(FrameworkConstants.UPDATED_TIMESTAMP) != null) {
                     authTime = Long.parseLong(
                             sessionContext.getProperty(FrameworkConstants.UPDATED_TIMESTAMP).toString());
                 } else {
@@ -1401,6 +1407,7 @@ public class OAuth2AuthzEndpoint {
                 }
             }
         }
+        previousAuthTime = authTime;
         return authTime;
     }
 }

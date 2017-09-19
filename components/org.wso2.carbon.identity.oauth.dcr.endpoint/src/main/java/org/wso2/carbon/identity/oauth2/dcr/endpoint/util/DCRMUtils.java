@@ -52,6 +52,13 @@ public class DCRMUtils {
         appRegistrationRequest.setClientName(registrationRequestDTO.getClientName());
         appRegistrationRequest.setRedirectUris(registrationRequestDTO.getRedirectUris());
         appRegistrationRequest.setGrantTypes(registrationRequestDTO.getGrantTypes());
+        appRegistrationRequest.setResponse_types(registrationRequestDTO.getResponseTypes());
+        appRegistrationRequest.setContacts(registrationRequestDTO.getContacts());
+        appRegistrationRequest.setPost_logout_redirect_uris(registrationRequestDTO.getPostLogoutRedirectUris());
+        appRegistrationRequest.setRequest_uris(registrationRequestDTO.getRequestUris());
+        appRegistrationRequest.setApplication_type(registrationRequestDTO.getApplicationType());
+        appRegistrationRequest.setJwks_uri(registrationRequestDTO.getJwksUri());
+        appRegistrationRequest.setUrl(registrationRequestDTO.getUrl());
         return appRegistrationRequest;
 
     }

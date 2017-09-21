@@ -1644,21 +1644,23 @@ public class OAuth2Util {
         return buf.toString();
     }
 
-    public static ArrayList<String> getEssentialClaims(String essentialClaims, String claimType) {
-        JSONObject jsonObjectClaims = new JSONObject(essentialClaims);
-        String key;
+    /** essentialClaimJson contains id_token and userinfo essential claims.
+     * This method returns the essential claim corresponding to the claim type (id_token or userinfo)**/
+    public static ArrayList<String> getEssentialClaims(String essentialClaimsJson, String claimType) {
         ArrayList essentailClaimslist = new ArrayList();
-        if ((jsonObjectClaims != null) && jsonObjectClaims.toString().contains(claimType)) {
-            JSONObject newJSON = jsonObjectClaims.getJSONObject(claimType);
-            if (newJSON != null) {
-                Iterator<?> keys = newJSON.keys();
-                while (keys.hasNext()) {
-                    key = (String) keys.next();
-                    if (!newJSON.isNull(key)) {
-                        String value;
-                        value = newJSON.get(key).toString();
-                        JSONObject jsonObjectValues = new JSONObject(value);
-                        if (jsonObjectValues != null) {
+        if (essentialClaimsJson != null & claimType != null) {
+            JSONObject jsonObjectClaims = new JSONObject(essentialClaimsJson);
+            String key;
+            if (jsonObjectClaims.toString().contains(claimType)) {
+                JSONObject newJSON = jsonObjectClaims.getJSONObject(claimType);
+                if (newJSON != null) {
+                    Iterator<?> keys = newJSON.keys();
+                    while (keys.hasNext()) {
+                        key = (String) keys.next();
+                        if (!newJSON.isNull(key)) {
+                            String value;
+                            value = newJSON.get(key).toString();
+                            JSONObject jsonObjectValues = new JSONObject(value);
                             Iterator<?> claimKeyValues = jsonObjectValues.keys();
                             while (claimKeyValues.hasNext()) {
                                 String claimKey = (String) claimKeyValues.next();
@@ -1673,7 +1675,6 @@ public class OAuth2Util {
                 }
             }
         }
-
         return essentailClaimslist;
     }
 
